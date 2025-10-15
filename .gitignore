@@ -1,3 +1,13 @@
+# Game save files (personal data)
+*.sav
+decoded_save.json
+
+# Temporary analysis files
+analyze*.py
+examine_*.py
+find_*.py
+medals_search.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
