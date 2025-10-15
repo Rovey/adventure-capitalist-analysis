@@ -147,133 +147,158 @@ def decode_adventure_communist_save(filename):
 # IDs 36-38 are currencies
 CARD_NAMES = {
     # === PRIMARY RESOURCES (Total Earned) ===
-    1: "🥔 POTATOES (Total Earned)",
-    2: "🏞️ LAND (Total Earned)",
-    3: "⚔️ WEAPONS (Total Earned)",
-    4: "⛏️ ORE (Total Earned)",
-    5: "💊 MEDICINE (Total Earned)",
+    1: "POTATOES (Total Earned)",
+    2: "LAND (Total Earned)",
+    3: "WEAPONS (Total Earned)",
+    4: "ORE (Total Earned)",
+    5: "MEDICINE (Total Earned)",
     
     # === POTATO INDUSTRY (IDs 6-10) ===
-    6: "👨‍🌾 Farmer (Upgrade Cost)",
-    7: "🏘️ Commune (Upgrade Cost)",
-    8: "🏛️ Collective (Upgrade Cost)",
-    9: "🏡 Plantation (Count/Level)",
-    10: "🏢 Hive (Count/Level)",
+    6: "Farmer (Upgrade Cost)",
+    7: "Commune (Upgrade Cost)",
+    8: "Collective (Upgrade Cost)",
+    9: "Plantation (Count/Level)",
+    10: "Hive (Count/Level)",
     
     # === LAND INDUSTRY (IDs 11-15) ===
-    11: "👷 Worker (Level)",
-    12: "🚧 Blasting Site (Count) = 8.42e+16",
-    13: "🌲 Clearcut (Upgrade Cost) = 1.35e+09",
-    14: "🛣️ Road (Count) = 152",
-    15: "🛤️ Highway (Count/Level)",
+    11: "Worker (Level)",
+    12: "Blasting Site (Count)",
+    13: "Clearcut (Upgrade Cost)",
+    14: "Road (Count)",
+    15: "Highway (Count/Level)",
     
     # === ORE INDUSTRY (IDs 16-21) ===
-    16: "⛏️ Super Highway (Level)",
-    17: "👨‍🔧 Miner (Level)",
-    18: "⛰️ Mine (Count) = 1.33e+14",
-    19: "🚜 Excavator (Count) = 4.28e+06",
-    20: "🏔️ Mega Mine (Level)",
-    21: "🗻 Deep Bore (Count/Level)",
+    16: "Super Highway (Level)",
+    17: "Miner (Level)",
+    18: "Mine (Count)",
+    19: "Excavator (Count)",
+    20: "Mega Mine (Level)",
+    21: "Deep Bore (Count/Level)",
     
     # === WEAPONS INDUSTRY (IDs 22-27) ===
-    22: "🪖 Mega Drill (Level)",
-    23: "🎖️ Soldier (Level)",
-    24: "👥 Fireteam (Count) = 5.29e+16",
-    25: "⚔️ Squad (Upgrade Cost) = 1.28e+09",
-    26: "🛡️ Platoon (Count) = 215",
-    27: "🎯 Division (Count/Level)",
+    22: "Mega Drill (Level)",
+    23: "Soldier (Level)",
+    24: "Fireteam (Count)",
+    25: "Squad (Upgrade Cost)",
+    26: "Platoon (Count)",
+    27: "Division (Count/Level)",
     
     # === MEDICINE INDUSTRY (IDs 28-33) ===
-    28: "🏛️ Communist Ideal (Level)",
-    29: "👨‍⚕️ Nurse (Level)",
-    30: "🚑 Ambulance (Count) = 1.68e+07",
-    31: "🏥 Field Hospital (Count) = 171",
-    32: "🏨 Clinic (Level)",
-    33: "🏩 Hospital (Count/Level)",
+    28: "Communist Ideal (Level)",
+    29: "Nurse (Level)",
+    30: "Ambulance (Count)",
+    31: "Field Hospital (Count)",
+    32: "Clinic (Level)",
+    33: "Hospital (Count/Level)",
     
     # === OTHER ===
-    34: "🧬 Cloning Lab (Count/Level)",
+    34: "Cloning Lab (Count/Level)",
     35: "Card 35 (Level)",
     
     # === CURRENCIES ===
-    36: "💎 SCIENTISTS (Currency)",
-    37: "🥔 Potatoes (Current Resource)",
-    38: "👥 COMRADES (Currency)",
+    36: "SCIENTISTS",
+    37: "Potatoes (Current Resource)",
+    38: "COMRADES",
     39: "Card 39",
 }
 
 # Main execution
 save_file = "game.sav"
-print(f"🔍 Decoding: {save_file}\n")
+print(f"Decoding: {save_file}\n")
 
 decoded_data = decode_adventure_communist_save(save_file)
 
 if decoded_data:
-    print("\n" + "="*70)
-    print("💰 CURRENCY & RESOURCES")
-    print("="*70)
+    # === CURRENCIES ===
+    print("=" * 80)
+    print("CURRENCIES")
+    print("=" * 80)
+    scientists = decoded_data['cards'].get(36, {}).get('value', 0)
+    comrades = decoded_data['cards'].get(38, {}).get('value', 0)
+    print(f"Scientists: {scientists:,.0f}")
+    print(f"Comrades:   {comrades:,.2e}")
     
-    if decoded_data['currency']:
-        for key, value in decoded_data['currency'].items():
-            print(f"{key:50s}: {value}")
-    else:
-        print("  (No currency data found)")
-    
-    print("\n" + "="*70)
-    print("🎯 MISSION PROGRESS & MEDALS")
-    print("="*70)
+    # === MISSION PROGRESS ===
+    print("\n" + "=" * 80)
+    print("MISSION PROGRESS & MEDALS")
+    print("=" * 80)
     
     if decoded_data['mission_progress']:
-        # Add context to known entries
         mission_labels = {
-            'Intro': 'Farming Medals (Intro)',
+            'Intro': 'Farming Medals',
             'Medals': 'Total Medals',
             'Potatoes': 'Potato Missions',
             'Land': 'Land Missions',
             'Ore': 'Ore Missions', 
             'Weapon': 'Weapon Missions',
-            'Medicine.Earned.Total': 'Medicine/Industry Experiments',
+            'Medicine.Earned.Total': 'Industry Experiments',
         }
         
         for key, value in decoded_data['mission_progress'].items():
             display_key = mission_labels.get(key, key)
-            print(f"{display_key:45s}: {value:5d}")
-    else:
-        print("  (No mission progress found)")
+            print(f"{display_key:30s}: {value:5d}")
     
-    print("\n" + "="*70)
-    print("🎴 CARDS / RESEARCHERS")
-    print("="*70)
+    # === RESOURCES ===
+    print("\n" + "=" * 80)
+    print("TOTAL RESOURCES EARNED")
+    print("=" * 80)
+    resource_ids = [1, 2, 3, 4, 5]
+    for card_id in resource_ids:
+        if card_id in decoded_data['cards']:
+            card = decoded_data['cards'][card_id]
+            name = CARD_NAMES.get(card_id, f"Resource {card_id}")
+            value = card['value']
+            print(f"{name:30s}: {value:.2e}")
     
-    for card_id in sorted(decoded_data['cards'].keys(), reverse=True):
-        card = decoded_data['cards'][card_id]
-        name = CARD_NAMES.get(card_id, f"Card/Resource {card_id}")
-        value = card['value']
+    # === GENERATORS (organized by industry) ===
+    print("\n" + "=" * 80)
+    print("GENERATORS & UPGRADES")
+    print("=" * 80)
+    
+    industries = {
+        'POTATO': range(6, 11),
+        'LAND': range(11, 16),
+        'ORE': range(16, 22),
+        'WEAPONS': range(22, 28),
+        'MEDICINE': range(28, 34),
+    }
+    
+    for industry_name, id_range in industries.items():
+        has_data = False
+        output_lines = []
         
-        if value > 0:  # Only show non-zero values
-            print(f"ID {card_id:3d}: {name:30s} = {value:15,.2f}")
-    
-    print("\n" + "="*70)
-    print("📈 STATISTICS")
-    print("="*70)
-    
-    for key, value in decoded_data['statistics'].items():
-        if value > 0:  # Only show non-zero values
-            print(f"{key:50s}: {value:15,.2f}")
+        for card_id in id_range:
+            if card_id in decoded_data['cards']:
+                card = decoded_data['cards'][card_id]
+                value = card['value']
+                if value > 0:
+                    has_data = True
+                    name = CARD_NAMES.get(card_id, f"Card {card_id}")
+                    if value > 1e6:
+                        output_lines.append(f"  [{card_id:2d}] {name:30s}: {value:.2e}")
+                    else:
+                        output_lines.append(f"  [{card_id:2d}] {name:30s}: {value:,.0f}")
+        
+        if has_data:
+            print(f"\n{industry_name}:")
+            for line in output_lines:
+                print(line)
     
     # Save to JSON
     output = {
-        'currency': decoded_data['currency'],
+        'currency': {
+            'scientists': scientists,
+            'comrades': comrades
+        },
         'mission_progress': decoded_data['mission_progress'],
         'cards': {k: v['value'] for k, v in decoded_data['cards'].items()},
-        'statistics': decoded_data['statistics']
     }
     
     with open("decoded_save.json", "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2)
     
-    print("\n" + "="*70)
-    print("✅ Full data saved to: decoded_save.json")
-    print("="*70)
+    print("\n" + "=" * 80)
+    print("Data saved to: decoded_save.json")
+    print("=" * 80)
 else:
-    print("❌ Failed to decode save file")
+    print("Failed to decode save file")
