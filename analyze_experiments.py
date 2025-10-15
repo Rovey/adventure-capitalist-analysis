@@ -4,7 +4,7 @@ Shows which experiments give the best return on investment
 """
 
 import sys
-from decoder import decode_adventure_communist_save
+from decoder_gui import decode_adventure_communist_save
 from experiments_roi import analyze_experiments, format_experiment_recommendations, get_industry_production_ranking
 
 
@@ -30,7 +30,7 @@ def main():
     print("="*90)
     production = get_industry_production_ranking(decoded_data)
     for i, (industry, value) in enumerate(production.items(), 1):
-        bar = "█" * min(50, int(value / max(production.values()) * 50)) if value > 0 else ""
+        bar = "#" * min(50, int(value / max(production.values()) * 50)) if value > 0 else ""
         print(f"{i}. {industry:10} {value:12.2e} {bar}")
     
     # Analyze experiments
