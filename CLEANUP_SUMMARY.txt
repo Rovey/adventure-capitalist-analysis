@@ -1,0 +1,109 @@
+# Project Cleanup Summary
+
+## Files Kept (7 core files + 2 config)
+
+### Core Application
+1. **decoder.py** - Core save file decoding functions
+2. **decoder_gui.py** - GUI application with tkinter
+3. **experiments_roi.py** - Experiments database and ROI calculation
+4. **analyze_experiments.py** - Command-line analysis tool
+
+### Documentation & Config
+5. **README.md** - Complete consolidated documentation (9.7 KB)
+6. **LICENSE** - MIT License
+7. **.gitignore** - Excludes personal save files
+
+### Personal Data (Not Committed - Ignored by .gitignore)
+- `game.sav` - Your local save file (ignored)
+- `decoded_save.json` - Exported data (ignored)
+
+## Files Removed (14 files)
+
+### Deprecated Tools (Old Generator-Based System)
+- `analyze_roi.py` - Replaced by analyze_experiments.py
+- `roi_calculator.py` - Replaced by experiments_roi.py
+- `ROI_EXAMPLE.md` - Consolidated into README.md
+
+### Temporary Test Files
+- `find_cards.py` - Debug tool
+- `test_decoder.py` - Test script
+- `test_local.py` - Test script
+- `test_steam.py` - Test script
+- `quick_analysis.py` - Test script
+- `game_steam.sav` - Temporary save copy
+
+### Documentation (Consolidated into README.md)
+- `EXAMPLE_OUTPUT.md` - Example outputs
+- `EXPERIMENTS_GUIDE.md` - Strategy guide
+- `REBUILD_SUMMARY.md` - Changelog
+- `SAVE_FILES.md` - Save file locations guide
+- `TOOLS.md` - Tools reference
+
+## What Changed
+
+### decoder.py
+- Fixed: Expanded card data search range (0x1400-0x1600)
+- Fixed: Added `if __name__ == "__main__"` guard
+- Now works with both old and new save file formats
+
+### decoder_gui.py
+- Fixed: Expanded card data search range (0x1400-0x1600)
+- Changed: Replaced old ROI button with "Analyze Experiments"
+- Added: experiments_roi imports
+- Added: Industry production ranking display
+
+### experiments_roi.py (NEW)
+- Complete experiments database (30+ experiments)
+- ROI calculation for INDUSTRY/STATE/TRIALS experiments
+- Smart tiebreaking: prioritizes weakest industries
+- Industry production ranking function
+
+### analyze_experiments.py (NEW)
+- Command-line tool for experiments analysis
+- Shows industry ranking + top recommendations
+- Works with custom save file paths
+
+### README.md
+- Complete rewrite with all documentation consolidated
+- Quick start guide
+- Strategy recommendations
+- Technical details
+- Troubleshooting section
+- Example outputs
+
+### .gitignore
+- Updated comments for clarity
+- Added test_*.py, quick_*.py patterns
+- Ensures no personal save data is committed
+
+## Ready for Git Commit
+
+All files are clean and ready to commit:
+
+```bash
+git add .
+git commit -m "Add experiments ROI analyzer with GUI and consolidated documentation"
+git push
+```
+
+## What Gets Committed vs Ignored
+
+### ✅ Committed to Git
+- All Python source code (.py files)
+- README.md documentation
+- LICENSE file
+- .gitignore configuration
+
+### ❌ Never Committed (In .gitignore)
+- *.sav files (your game saves)
+- decoded_save.json (exported data)
+- test_*.py (temporary test files)
+- __pycache__/ (Python bytecode)
+
+## Project is Now Clean! 🎉
+
+- 7 essential files
+- 1 comprehensive README
+- No temporary/test files
+- No personal data in repo
+- Ready for public GitHub repository

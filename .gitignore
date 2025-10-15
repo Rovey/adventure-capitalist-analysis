@@ -1,11 +1,14 @@
-# Game save files (personal data)
+# Game save files (personal data - never commit these!)
 *.sav
 decoded_save.json
 
-# Temporary analysis files
-analyze*.py
-examine_*.py
+# Temporary analysis/test files
+test_*.py
+quick_*.py
 find_*.py
+examine_*.py
+analyze_cards.py
+analyze_patterns.py
 medals_search.py
 
 # Byte-compiled / optimized / DLL files

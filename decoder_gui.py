@@ -5,6 +5,7 @@ import struct
 import json
 from pathlib import Path
 from collections import OrderedDict
+from experiments_roi import analyze_experiments, format_experiment_recommendations, get_industry_production_ranking
 
 # Import the decoder functions from decoder.py
 def decode_adventure_communist_save(filename):
@@ -18,8 +19,8 @@ def decode_adventure_communist_save(filename):
     
     cards = OrderedDict()
     
-    # Find the card data section
-    for start_pos in range(0x1400, 0x1500):
+    # Find the card data section (search wider range as offset can vary)
+    for start_pos in range(0x1400, 0x1600):
         try:
             id1 = struct.unpack('<I', data[start_pos:start_pos+4])[0]
             id2 = struct.unpack('<I', data[start_pos+16:start_pos+20])[0]
@@ -123,6 +124,9 @@ class AdventureDecoderGUI:
         self.root.title("Adventure Communist Save Decoder")
         self.root.geometry("900x700")
         
+        # Initialize data storage
+        self.decoded_data = None
+        
         # Detect Steam save path
         self.default_path = self.detect_steam_path()
         
@@ -183,6 +187,10 @@ class AdventureDecoderGUI:
         # Load button
         self.load_button = ttk.Button(top_frame, text="Decode Save", command=self.load_save, state='normal')
         self.load_button.grid(row=0, column=3, padx=5, pady=5)
+        
+        # Experiments ROI Analysis button
+        self.roi_button = ttk.Button(top_frame, text="Analyze Experiments", command=self.analyze_roi, state='disabled')
+        self.roi_button.grid(row=0, column=4, padx=5, pady=5)
         
         # Status label
         self.status_var = tk.StringVar(value="Ready")
@@ -272,6 +280,10 @@ class AdventureDecoderGUI:
     
     def display_results(self, decoded_data, filepath):
         """Display decoded data in the text area"""
+        # Store decoded data for ROI analysis
+        self.decoded_data = decoded_data
+        self.roi_button.config(state='normal')
+        
         self.output_text.delete(1.0, tk.END)
         
         output = []
@@ -374,6 +386,47 @@ class AdventureDecoderGUI:
             self.output_text.insert(tk.END, "=" * 80)
         except Exception as e:
             print(f"Error saving JSON: {e}")
+    
+    def analyze_roi(self):
+        """Analyze and display Experiments ROI recommendations"""
+        if not hasattr(self, 'decoded_data') or not self.decoded_data:
+            self.status_var.set("Error: No save file loaded")
+            return
+        
+        try:
+            self.status_var.set("Analyzing Experiments...")
+            self.root.update()
+            
+            # Show industry ranking
+            self.output_text.delete(1.0, tk.END)
+            
+            output = []
+            output.append("="*90)
+            output.append("INDUSTRY PRODUCTION RANKING (Focus on weakest)")
+            output.append("="*90 + "\n")
+            
+            production = get_industry_production_ranking(self.decoded_data)
+            for i, (industry, value) in enumerate(production.items(), 1):
+                bar = "█" * min(40, int(value / max(production.values()) * 40)) if value > 0 else ""
+                output.append(f"{i}. {industry:10} {value:12.2e} {bar}")
+            
+            self.output_text.insert(tk.END, "\n".join(output) + "\n\n")
+            
+            # Analyze experiments
+            recommendations, current_scientists = analyze_experiments(self.decoded_data)
+            
+            # Display results
+            exp_output = format_experiment_recommendations(recommendations, current_scientists, top_n=20)
+            self.output_text.insert(tk.END, exp_output)
+            
+            self.status_var.set(f"Experiments Analysis Complete - {len(recommendations)} experiments analyzed")
+            
+        except Exception as e:
+            self.status_var.set(f"Error: {str(e)}")
+            self.output_text.delete(1.0, tk.END)
+            self.output_text.insert(tk.END, f"Error analyzing experiments:\n{str(e)}\n\n")
+            import traceback
+            self.output_text.insert(tk.END, traceback.format_exc())
 
 
 def main():

@@ -1,156 +1,301 @@
-# Adventure Communist Save File Decoder
+# Adventure Communist Save File Decoder & Experiments Analyzer
 
-A Python tool to decode and analyze Adventure Communist game save files. This decoder extracts game state information including currencies, resources, generators, and mission progress from the binary FlatBuffer save format.
+A Python tool to decode and analyze Adventure Communist save files, with intelligent recommendations for which experiments to research next.
 
 ## Features
 
-- **Decode Binary Save Files**: Reads `.sav` files with the ADCM (Adventure Communist) format
-- **Extract Game Data**:
+- **Save File Decoding**: Parses Adventure Communist binary save files (FlatBuffer format with ADCM header)
+- **Game State Extraction**:
   - Scientists and Comrades currencies
-  - Total resources earned across all industries
-  - Generator counts and upgrade costs
+  - Total resources earned per industry
+  - Generator counts and levels
   - Mission progress and medals
-- **Clean Output**: Organized display of game state by industry
-- **JSON Export**: Saves decoded data to JSON for further analysis
+  - Industry experiments completed
+- **Experiments ROI Analysis**: Smart recommendations for which experiments to research
+  - Ranks all affordable experiments by impact per Scientist spent
+  - Prioritizes permanent INDUSTRY multipliers (x99999, x9999, x999)
+  - Automatically prioritizes weakest industries when ROI scores are equal
+  - Shows industry production ranking to identify bottlenecks
+  - Distinguishes between permanent upgrades and temporary boosts
+- **GUI Application**: Easy-to-use graphical interface
+  - Auto-detects Steam save file location
+  - Real-time decoding and analysis
+  - Export data to JSON
 
 ## Installation
 
 1. Clone this repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Rovey/adventure-capitalist-analysis.git
 cd adventure-capitalist-analysis
 ```
 
 2. Ensure Python 3.6+ is installed
 
-No additional dependencies required - uses only Python standard library!
+**No additional dependencies required** - uses only Python standard library!
 
-## Usage
+## Quick Start
 
 ### GUI Application (Recommended)
-
-Run the graphical interface:
 
 ```bash
 python decoder_gui.py
 ```
 
-The GUI will:
-- **Auto-detect Steam save location**: Automatically finds your Adventure Communist save in `C:\Program Files (x86)\Steam\userdata\[USER_ID]\462930\remote\game.sav`
-- **Browse for files**: Select any `.sav` file from any location
-- **Real-time decoding**: View results instantly in the application
-- **Export to JSON**: Automatically saves decoded data
+**How to use:**
+1. GUI auto-detects your Steam save location
+2. Click **"Decode Save"** to view your game data
+3. Click **"Analyze Experiments"** to see recommendations
+4. Go to EXPERIMENTS tab in-game and buy the top recommendation!
 
-### Command Line Usage
-
-Place your Adventure Communist save file in the project directory and rename it to `game.sav`, then run:
+### Command Line Analysis
 
 ```bash
-python decoder.py
+python analyze_experiments.py game.sav
 ```
 
-### Finding Your Save File
-
-Adventure Communist save files are typically located at:
-- **Windows**: `%LOCALAPPDATA%\Packages\[AdventureCommPackage]\LocalState\`
-- **Android**: Use a file manager with root access to find the save in the game's data directory
-
-The save files have a `.sav` extension and contain "ADCM" as a magic header.
-
-## Output
-
-The decoder displays:
-
-### 1. Currencies
-```
-Scientists: 43
-Comrades:   5.53e+10
+Or specify a custom save file path:
+```bash
+python analyze_experiments.py "C:\Path\To\game.sav"
 ```
 
-### 2. Mission Progress
-```
-Farming Medals: 6
-Total Medals: 23
-Industry Experiments: 12
-```
+## Finding Your Save File
 
-### 3. Total Resources Earned
+### Windows (Steam)
 ```
-POTATOES (Total Earned): 5.64e+35
-LAND (Total Earned): 1.24e+26
-ORE (Total Earned): 1.51e+25
-WEAPONS (Total Earned): 2.85e+22
-MEDICINE (Total Earned): 3.52e+20
+C:\Program Files (x86)\Steam\userdata\[USER_ID]\462930\remote\game.sav
 ```
 
-### 4. Generators by Industry
-Organized by POTATO, LAND, ORE, WEAPONS, and MEDICINE industries, showing:
-- Generator counts
-- Upgrade costs
-- Current levels
+Where `[USER_ID]` is your Steam user ID (a folder with numbers). If you have multiple user folders, look for the one with the most recent `game.sav`.
 
-## Data Structure
+The GUI automatically detects this location!
 
-The decoder identifies the following card/resource IDs:
+### Verify Save File
 
-| ID Range | Description |
-|----------|-------------|
-| 1-5 | Total resources earned per industry |
-| 6-10 | Potato industry generators |
-| 11-15 | Land industry generators |
-| 16-21 | Ore industry generators |
-| 22-27 | Weapons industry generators |
-| 28-33 | Medicine industry generators |
-| 36 | Scientists currency |
-| 37 | Current potato resource amount |
-| 38 | Comrades currency |
+Valid Adventure Communist save files:
+- Have `.sav` extension
+- Are 5-15 KB in size
+- Contain "ADCM" magic header at byte offset 0x04
 
-## Output Files
+## Understanding the Experiments Analysis
 
-- `decoded_save.json`: Complete decoded data in JSON format for further analysis
+### Experiment Types
+
+**INDUSTRY Experiments** (PERMANENT - Highest Priority!)
+- `Best-est` buttons: x99,999 multiplier (60 Scientists)
+- `Better-est` buttons: x9,999 multiplier (45 Scientists)
+- `Better-er` buttons: x999 multiplier (30 Scientists)
+- These are **permanent** and provide the best long-term value
+
+**STATE Experiments** (Utility)
+- `Button Auto-Clickers`: Automatically clicks production buttons (25 Scientists)
+- `Big Resource Surge`: 4 hours of resources instantly (50 Scientists)
+- `Mega Resource Surge`: 24 hours of resources instantly (150 Scientists)
+
+**TRIALS Experiments** (Temporary)
+- `Button Blasts`: x7,777 multiplier for 20-30 seconds (5-10 Scientists)
+- Only useful for completing specific missions
+
+### ROI Score Explained
+
+**ROI Score = (Production Increase × Priority) / Cost**
+
+- Higher score = Better value per Scientist
+- Example: x99,999 for 60 Scientists = ROI of 16,666
+- Example: x999 for 30 Scientists = ROI of 233
+
+### Smart Tiebreaking
+
+When experiments have equal ROI scores, the analyzer automatically prioritizes your **weakest industries**:
+
+**Priority order:** Medicine → Weapons → Ore → Land → Potato
+
+This ensures balanced progress across all industries!
+
+### Sample Output
+
+```
+INDUSTRY PRODUCTION RANKING (Focus on weakest)
+==================================================================================
+1. Medicine       3.06e+20  ← WEAKEST! 
+2. Ore            1.27e+22
+3. Weapons        1.06e+25
+4. Land           7.84e+25
+5. Potato         5.73e+35  ← STRONGEST!
+
+Current Scientists: 105
+
+TOP 5 AFFORDABLE EXPERIMENTS:
+
+1. Best-est Medicine Button
+   INDUSTRY | Medicine | Cost: 60 | Effect: x99,999
+   ROI: 16666.50 | Priority: 10/10
+   → MEDICINE production x99999 - HUGE permanent boost
+
+2. Best-est Weapon Button
+   INDUSTRY | Weapons | Cost: 60 | Effect: x99,999
+   ROI: 16666.50 | Priority: 10/10
+   → WEAPONS production x99999 - HUGE permanent boost
+```
+
+## Strategy Guide
+
+### Best Practices
+
+1. **Always prioritize INDUSTRY experiments** - They're permanent and give huge boosts
+2. **Focus on your weakest industry** - The tool automatically shows you which needs help
+3. **Get Button Auto-Clickers early** - Quality of life improvement worth the cost
+4. **Avoid temporary boosts** - Only buy TRIALS experiments when needed for missions
+5. **Save for big multipliers** - x99,999 boosts are worth waiting for
+
+### Example Decision Making
+
+**You have 105 Scientists:**
+
+**Option 1: Maximum Impact**
+- Buy `Best-est Medicine Button` (60 Scientists) - x99,999 permanent boost
+- Remaining: 45 Scientists for next upgrade
+
+**Option 2: Multiple Upgrades**
+- Buy `Better-est Medicine Button` (45 Scientists) - x9,999 boost
+- Buy `Button Auto-Clickers` (25 Scientists) - Automation
+- Remaining: 35 Scientists
+
+**Option 3: Save Up**
+- Don't buy anything yet
+- Wait until 120 Scientists
+- Buy two x99,999 boosts back-to-back
+
+### When to Buy What
+
+| Scientists | Best Purchase | Why |
+|-----------|--------------|-----|
+| 5-25 | Save up | Too small for meaningful impact |
+| 25-29 | Button Auto-Clickers | Quality of life |
+| 30-44 | x999 Multiplier (weakest industry) | Good permanent boost |
+| 45-59 | x9,999 Multiplier (weakest industry) | Strong permanent boost |
+| 60+ | x99,999 Multiplier (weakest industry) | HUGE permanent boost |
 
 ## Technical Details
 
 ### Save File Format
 
-Adventure Communist uses a FlatBuffer binary format with:
-- Magic header: `ADCM` at offset 0x04
-- Card data section: 16-byte entries at ~0x14a8
-  - 4 bytes: Card ID (uint32)
-  - 4 bytes: Flags (uint32)
-  - 8 bytes: Value (double)
+- **Format**: FlatBuffer binary format
+- **Magic Header**: "ADCM" at offset 0x04
+- **Card Data**: 16-byte entries (4 bytes ID + 4 bytes flags + 8 bytes double value)
+- **Card Data Location**: Typically around offset 0x14a8-0x1540 (varies by save file size)
 
-### Card Data Structure
+### Card ID Mapping
 
-Each card entry contains:
-- **ID**: Unique identifier for the resource/generator
-- **Flags**: Additional metadata (currently unused)
-- **Value**: Count, cost, or amount (stored as double-precision float)
+| Card ID | Data |
+|---------|------|
+| 1-5 | Total resources earned (Potatoes, Land, Ore, Weapons, Medicine) |
+| 6-33 | Generator counts by industry |
+| 36 | Scientists currency |
+| 38 | Comrades currency |
 
-## Use Cases
+### Experiments Database
 
-- **Progress Tracking**: Monitor your game progression over time
-- **ROI Analysis**: Calculate return on investment for researcher upgrades
-- **Save Comparison**: Compare different save states to optimize strategy
-- **Data Export**: Extract data for spreadsheet analysis
+The `experiments_roi.py` module contains a complete database of all 30+ experiments in Adventure Communist with accurate costs and effects.
 
-## Contributing
+## Output Files
+
+- **decoded_save.json**: Exported game data (created in same directory as save file)
+- Contains: currencies, mission progress, all card values
+- Useful for tracking progress over time or custom analysis
+
+## Privacy Note
+
+⚠️ **Never share your save files publicly!** They contain:
+- Your game progress
+- Potential account identifiers
+- Purchase history
+
+The `.gitignore` file is configured to exclude:
+- `*.sav` files
+- `decoded_save.json`
+- Personal game data
+
+## Troubleshooting
+
+### "No ADCM header found"
+- Ensure you're loading a valid `.sav` file
+- Verify it's Adventure **Communist** (not Adventure Capitalist)
+- Check file isn't corrupted
+
+### "Found 0 cards" or "Scientists: 0"
+- This was a bug in older versions - now fixed!
+- The tool now searches a wider offset range (0x1400-0x1600)
+- Update to latest version if you see this
+
+### Steam path not auto-detected
+- GUI looks in default Steam installation
+- Use Browse button to manually select save file
+- Verify Steam is installed at `C:\Program Files (x86)\Steam`
+
+### GUI doesn't open
+- Ensure Python has tkinter: `python -m tkinter`
+- Try command-line tool instead: `analyze_experiments.py`
+- Check Python version is 3.6+
+
+## Project Structure
+
+```
+adventure-capitalist-analysis/
+├── decoder.py              # Core decoding functions
+├── decoder_gui.py          # GUI application
+├── experiments_roi.py      # Experiments database and ROI logic
+├── analyze_experiments.py  # Command-line analysis tool
+├── README.md              # This file
+├── LICENSE                # MIT License
+└── .gitignore            # Excludes personal save files
+```
+
+## Development
+
+### Running Tests
+
+The decoder can be imported and used programmatically:
+
+```python
+from decoder import decode_adventure_communist_save
+from experiments_roi import analyze_experiments
+
+# Decode save file
+decoded_data = decode_adventure_communist_save("game.sav")
+
+# Analyze experiments
+recommendations, scientists = analyze_experiments(decoded_data)
+
+# Process recommendations
+for rec in recommendations[:5]:
+    print(f"{rec['name']}: {rec['cost']} Scientists")
+```
+
+### Contributing
 
 Contributions welcome! Areas for improvement:
-- Identifying remaining unknown card IDs
-- Decoding researcher card data
-- Parsing additional game statistics
-- Adding visualization tools
+- Additional experiment data (if new updates add more)
+- Better level estimation algorithms
+- Support for other save file locations (Android, iOS)
+- Historical progress tracking
+
+## Credits
+
+- **Game**: Adventure Communist by Hyper Hippo
+- **Analysis**: Understanding game mechanics through save file reverse engineering
+- **Format**: FlatBuffers binary format
 
 ## License
 
-See LICENSE file for details.
+MIT License - See LICENSE file for details.
 
 ## Disclaimer
 
-This tool is for educational and personal use only. It reads game save files but does not modify them. Use at your own risk.
+This tool is for educational purposes and personal use. It does not modify game files or provide any unfair advantages - it simply helps you make informed decisions about which experiments to research based on your current game state.
 
-## Acknowledgments
+---
 
-- Reverse engineering of the FlatBuffer save format
-- Adventure Communist game by Hyper Hippo Productions
+**Made with ❤️ for Adventure Communist players who want to optimize their progress!**
+
+Last Updated: October 15, 2025

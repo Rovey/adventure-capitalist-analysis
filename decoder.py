@@ -22,8 +22,8 @@ def decode_adventure_communist_save(filename):
     cards = OrderedDict()
     
     # Find the start of the card data section by looking for the pattern
-    # We know entries have decreasing IDs
-    for start_pos in range(0x1400, 0x1500):
+    # We know entries have decreasing IDs (search wider range as offset varies between saves)
+    for start_pos in range(0x1400, 0x1600):
         try:
             # Try to find a sequence of decreasing IDs
             id1 = struct.unpack('<I', data[start_pos:start_pos+4])[0]
@@ -203,36 +203,37 @@ CARD_NAMES = {
 }
 
 # Main execution
-save_file = "game.sav"
-print(f"Decoding: {save_file}\n")
+if __name__ == "__main__":
+    save_file = "game.sav"
+    print(f"Decoding: {save_file}\n")
 
-decoded_data = decode_adventure_communist_save(save_file)
+    decoded_data = decode_adventure_communist_save(save_file)
 
-if decoded_data:
-    # === CURRENCIES ===
-    print("=" * 80)
-    print("CURRENCIES")
-    print("=" * 80)
-    scientists = decoded_data['cards'].get(36, {}).get('value', 0)
-    comrades = decoded_data['cards'].get(38, {}).get('value', 0)
-    print(f"Scientists: {scientists:,.0f}")
-    print(f"Comrades:   {comrades:,.2e}")
-    
-    # === MISSION PROGRESS ===
-    print("\n" + "=" * 80)
-    print("MISSION PROGRESS & MEDALS")
-    print("=" * 80)
-    
-    if decoded_data['mission_progress']:
-        mission_labels = {
-            'Intro': 'Farming Medals',
-            'Medals': 'Total Medals',
-            'Potatoes': 'Potato Missions',
-            'Land': 'Land Missions',
-            'Ore': 'Ore Missions', 
-            'Weapon': 'Weapon Missions',
-            'Medicine.Earned.Total': 'Industry Experiments',
-        }
+    if decoded_data:
+        # === CURRENCIES ===
+        print("=" * 80)
+        print("CURRENCIES")
+        print("=" * 80)
+        scientists = decoded_data['cards'].get(36, {}).get('value', 0)
+        comrades = decoded_data['cards'].get(38, {}).get('value', 0)
+        print(f"Scientists: {scientists:,.0f}")
+        print(f"Comrades:   {comrades:,.2e}")
+        
+        # === MISSION PROGRESS ===
+        print("\n" + "=" * 80)
+        print("MISSION PROGRESS & MEDALS")
+        print("=" * 80)
+        
+        if decoded_data['mission_progress']:
+            mission_labels = {
+                'Intro': 'Farming Medals',
+                'Medals': 'Total Medals',
+                'Potatoes': 'Potato Missions',
+                'Land': 'Land Missions',
+                'Ore': 'Ore Missions', 
+                'Weapon': 'Weapon Missions',
+                'Medicine.Earned.Total': 'Industry Experiments',
+            }
         
         for key, value in decoded_data['mission_progress'].items():
             display_key = mission_labels.get(key, key)
@@ -284,21 +285,21 @@ if decoded_data:
             for line in output_lines:
                 print(line)
     
-    # Save to JSON
-    output = {
-        'currency': {
-            'scientists': scientists,
-            'comrades': comrades
-        },
-        'mission_progress': decoded_data['mission_progress'],
-        'cards': {k: v['value'] for k, v in decoded_data['cards'].items()},
-    }
-    
-    with open("decoded_save.json", "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2)
-    
-    print("\n" + "=" * 80)
-    print("Data saved to: decoded_save.json")
-    print("=" * 80)
-else:
-    print("Failed to decode save file")
+        # Save to JSON
+        output = {
+            'currency': {
+                'scientists': scientists,
+                'comrades': comrades
+            },
+            'mission_progress': decoded_data['mission_progress'],
+            'cards': {k: v['value'] for k, v in decoded_data['cards'].items()},
+        }
+        
+        with open("decoded_save.json", "w", encoding="utf-8") as f:
+            json.dump(output, f, indent=2)
+        
+        print("\n" + "=" * 80)
+        print("Data saved to: decoded_save.json")
+        print("=" * 80)
+    else:
+        print("Failed to decode save file")
