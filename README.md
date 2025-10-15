@@ -27,7 +27,21 @@ No additional dependencies required - uses only Python standard library!
 
 ## Usage
 
-### Basic Usage
+### GUI Application (Recommended)
+
+Run the graphical interface:
+
+```bash
+python decoder_gui.py
+```
+
+The GUI will:
+- **Auto-detect Steam save location**: Automatically finds your Adventure Communist save in `C:\Program Files (x86)\Steam\userdata\[USER_ID]\462930\remote\game.sav`
+- **Browse for files**: Select any `.sav` file from any location
+- **Real-time decoding**: View results instantly in the application
+- **Export to JSON**: Automatically saves decoded data
+
+### Command Line Usage
 
 Place your Adventure Communist save file in the project directory and rename it to `game.sav`, then run:
 
