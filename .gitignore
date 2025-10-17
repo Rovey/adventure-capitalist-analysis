@@ -6,6 +6,7 @@ decoded_save.json
 test_*.py
 quick_*.py
 find_*.py
+debug_*.py
 examine_*.py
 analyze_cards.py
 analyze_patterns.py
@@ -213,6 +214,10 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Claude Code
+#  Claude Code specific configuration and cache files
+.claude/
 
 # Marimo
 marimo/_static/
