@@ -45,6 +45,9 @@ def main():
     # Analyze experiments
     recommendations, current_scientists = analyze_experiments(decoded_data)
 
+    # Note: The save file doesn't store which specific experiments are researched
+    # To get accurate recommendations, update KNOWN_RESEARCHED list in experiments_roi.py
+
     # Display results
     output = format_experiment_recommendations(
         recommendations, current_scientists, top_n=20

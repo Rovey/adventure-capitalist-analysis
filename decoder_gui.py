@@ -81,6 +81,10 @@ def decode_adventure_communist_save(filename):
                     except:
                         pass
 
+    # Note: Researched experiments are stored as IDs in the binary format
+    # The save file doesn't contain easily extractable experiment data
+    # Users need to manually track which experiments they've researched
+
     return {
         "cards": cards,
         "mission_progress": mission_progress,
@@ -348,6 +352,7 @@ class AdventureDecoderGUI:
                 display_key = mission_labels.get(key, key)
                 output.append(f"{display_key:30s}: {value:5d}")
 
+
         # Resources
         output.append("\n" + "=" * 80)
         output.append("TOTAL RESOURCES EARNED")
@@ -449,6 +454,8 @@ class AdventureDecoderGUI:
             self.output_text.insert(tk.END, "\n".join(output) + "\n\n")
 
             # Analyze experiments
+            # Note: Save file doesn't store which specific experiments are researched
+            # User needs to manually update KNOWN_RESEARCHED in experiments_roi.py
             recommendations, current_scientists = analyze_experiments(self.decoded_data)
 
             # Display results

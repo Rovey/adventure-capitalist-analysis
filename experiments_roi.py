@@ -208,9 +208,13 @@ EXPERIMENTS = {
     },
 }
 
-# Known researched experiments (from your screenshot: 12/30)
+# Known researched experiments
+# The save file doesn't store which specific experiments you own, only the count.
+# Manually update this list with experiments you've already researched to get accurate recommendations.
+# Check in-game under EXPERIMENTS > INDUSTRY/STATE/TRIALS tabs to see which ones show as "RESEARCHED"
 KNOWN_RESEARCHED = [
-    "Best-est Potato Button",  # Shows as researched in screenshot
+    # Example: "Best-est Potato Button",
+    # Example: "Button Auto-Clickers",
 ]
 
 
@@ -275,7 +279,7 @@ def analyze_experiments(decoded_data, researched_experiments=None):
     # Get current production levels (for context and tiebreaker)
     current_production = {}
     if "cards" in decoded_data:
-        resource_map = {1: "Potato", 2: "Land", 4: "Weapons", 3: "Ore", 5: "Medicine"}
+        resource_map = {1: "Potato", 2: "Land", 3: "Weapons", 4: "Ore", 5: "Medicine"}
         for card_id, name in resource_map.items():
             if card_id in decoded_data["cards"]:
                 current_production[name] = decoded_data["cards"][card_id].get(
@@ -331,7 +335,11 @@ def format_experiment_recommendations(recommendations, current_scientists, top_n
     output.append(f"Current Scientists: {current_scientists:,}\n")
     output.append(f"{'='*90}")
     output.append(f"TOP {min(top_n, len(recommendations))} EXPERIMENT RECOMMENDATIONS")
-    output.append(f"{'='*90}\n")
+    output.append(f"{'='*90}")
+    output.append("")
+    output.append("NOTE: To filter out experiments you already own, update the KNOWN_RESEARCHED")
+    output.append("list in experiments_roi.py with the names of experiments you've researched.")
+    output.append("")
 
     affordable = [r for r in recommendations if r["affordable"]]
     unaffordable = [r for r in recommendations if not r["affordable"]]
@@ -422,7 +430,7 @@ def get_industry_production_ranking(decoded_data):
     if "cards" not in decoded_data:
         return {}
 
-    resource_map = {1: "Potato", 2: "Land", 4: "Weapons", 3: "Ore", 5: "Medicine"}
+    resource_map = {1: "Potato", 2: "Land", 3: "Weapons", 4: "Ore", 5: "Medicine"}
     production = {}
 
     for card_id, name in resource_map.items():
